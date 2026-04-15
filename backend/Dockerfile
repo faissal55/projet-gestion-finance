@@ -1,10 +1,10 @@
 FROM php:8.2-cli
 
-# Installer extensions nécessaires
+# Installer dépendances
 RUN apt-get update && apt-get install -y \
+    git \
     unzip \
     curl \
-    git \
     libzip-dev \
     zip \
     && docker-php-ext-install pdo pdo_mysql pdo_pgsql
@@ -15,14 +15,17 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Dossier de travail
 WORKDIR /app
 
-# Copier les fichiers
+# Copier le projet
 COPY . .
 
-# Installer Laravel
-RUN composer install
+# Installer dépendances Laravel
+RUN composer install --no-dev --optimize-autoloader
+
+# Permissions Laravel
+RUN chmod -R 775 storage bootstrap/cache
 
 # Exposer le port
 EXPOSE 10000
 
-# Lancer le serveur Laravel
-CMD php artisan serve --host=0.0.0.0 --port=10000
+# Lancer Laravel
+CMD php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=10000
