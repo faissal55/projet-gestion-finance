@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: laravel-backend
+    env: docker
+    rootDir: backend
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: APP_KEY
+        sync: false
+
+  - type: web
+    name: nextjs-frontend
+    env: node
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NEXT_PUBLIC_API_URL
+        value: https://projet-gestion-finance.onrender.com
